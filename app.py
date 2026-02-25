@@ -9,6 +9,7 @@ def read_tasks():
     if not os.path.exists(TASKS_FILE):
         return []
     df = pd.read_csv(TASKS_FILE)
+    df = df.fillna('')
     return df.to_dict(orient='records')
 
 def write_tasks(tasks):
@@ -58,7 +59,7 @@ def add_task():
         'task': task_name,
         'status': 'incomplete',
         'importance': 'low', # Default
-        'urgency': 'low'     # Default
+        'due_date': ''       # Default
     }
     tasks.append(new_task)
     write_tasks(tasks)

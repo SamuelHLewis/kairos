@@ -20,6 +20,11 @@
         </div>
         <div class="matrix-panel">
             <h2>Eisenhower Matrix</h2>
+            <div class="threshold-control" style="margin-bottom: 20px;">
+                <label for="urgency-threshold">Urgency Threshold (days): <span id="threshold-display">3</span></label>
+                <input type="range" id="urgency-threshold" min="1" max="10" value="3" 
+                       oninput="document.getElementById('threshold-display').textContent = this.value; renderMatrix(currentTasks)">
+            </div>
             <div class="matrix-grid">
                 <div class="quadrant q1">
                     <h3>Do First (Urgent & Important)</h3>

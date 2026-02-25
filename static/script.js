@@ -1,3 +1,5 @@
+let currentTasks = [];
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchTasks();
 });
@@ -6,6 +8,7 @@ function fetchTasks() {
     fetch('/tasks')
         .then(response => response.json())
         .then(tasks => {
+            currentTasks = tasks;
             renderTaskList(tasks);
             renderMatrix(tasks);
         })
@@ -37,11 +40,8 @@ function renderTaskList(tasks) {
                     </select>
                 </div>
                 <div class="task-control-group">
-                    <label>Urgency:</label>
-                    <select onchange="updateTask('${task.id}', 'urgency', this.value)">
-                        <option value="high" ${task.urgency === 'high' ? 'selected' : ''}>High</option>
-                        <option value="low" ${task.urgency === 'low' ? 'selected' : ''}>Low</option>
-                    </select>
+                    <label>Due Date:</label>
+                    <input type="date" value="${task.due_date || ''}" onchange="updateTask('${task.id}', 'due_date', this.value)">
                 </div>
                 <button class="delete-btn" onclick="deleteTask('${task.id}')">Delete</button>
             </div>
@@ -110,17 +110,36 @@ function renderMatrix(tasks) {
     q3List.innerHTML = '';
     q4List.innerHTML = '';
 
+    const thresholdSlider = document.getElementById('urgency-threshold');
+    const thresholdDays = thresholdSlider ? parseInt(thresholdSlider.value, 10) : 3;
+
     tasks.forEach(task => {
         if (task.status === 'complete') return; // Don't show completed tasks in matrix
+
+        let isUrgent = false;
+        if (task.due_date) {
+            const dueDate = new Date(task.due_date);
+            const today = new Date();
+            // Reset time parts for accurate day comparison
+            dueDate.setHours(0,0,0,0);
+            today.setHours(0,0,0,0);
+            
+            const diffTime = dueDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            isUrgent = diffDays <= thresholdDays;
+        }
+
+        const isImportant = task.importance === 'high';
 
         const li = document.createElement('li');
         li.textContent = task.task;
 
-        if (task.importance === 'high' && task.urgency === 'high') {
+        if (isImportant && isUrgent) {
             q1List.appendChild(li);
-        } else if (task.importance === 'high' && task.urgency === 'low') {
+        } else if (isImportant && !isUrgent) {
             q2List.appendChild(li);
-        } else if (task.importance === 'low' && task.urgency === 'high') {
+        } else if (!isImportant && isUrgent) {
             q3List.appendChild(li);
         } else {
             q4List.appendChild(li);
