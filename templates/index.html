@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAIROS</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="task-list-panel">
+            <h2>Tasks</h2>
+            <div class="add-task-form">
+                <input type="text" id="new-task-input" placeholder="Add a new task..." onkeypress="handleEnter(event)">
+                <button onclick="addTask()">Add</button>
+            </div>
+            <ul id="task-list">
+                <!-- Tasks will be injected here via JS -->
+            </ul>
+        </div>
+        <div class="matrix-panel">
+            <h2>Eisenhower Matrix</h2>
+            <div class="matrix-grid">
+                <div class="quadrant q1">
+                    <h3>Do First (Urgent & Important)</h3>
+                    <ul id="q1-list"></ul>
+                </div>
+                <div class="quadrant q2">
+                    <h3>Schedule (Not Urgent & Important)</h3>
+                    <ul id="q2-list"></ul>
+                </div>
+                <div class="quadrant q3">
+                    <h3>Delegate (Urgent & Not Important)</h3>
+                    <ul id="q3-list"></ul>
+                </div>
+                <div class="quadrant q4">
+                    <h3>Don't Do (Not Urgent & Not Important)</h3>
+                    <ul id="q4-list"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>

@@ -1,3 +1,7 @@
-KAIROS: Keep All Important Roles On Schedule
+# KAIROS
 
-This is a simple task management app.
+KAIROS: Keep All Important Requirements On Schedule
+
+A simple task management app.
+
+##
