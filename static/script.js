@@ -1,8 +1,31 @@
 let currentTasks = [];
 
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     fetchTasks();
 });
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    const btn = document.getElementById('theme-btn');
+    if (btn) {
+        btn.textContent = savedTheme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode';
+    }
+}
+
+function toggleTheme() {
+    const root = document.documentElement;
+    const currentTheme = root.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    root.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    
+    const btn = document.getElementById('theme-btn');
+    if (btn) {
+        btn.textContent = newTheme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode';
+    }
+}
 
 function fetchTasks() {
     fetch('/tasks')

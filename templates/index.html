@@ -3,13 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAIROS</title>
+    <title>⚡ KAIROS</title>
     <link rel="stylesheet" href="/static/style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
 </head>
 <body>
     <div class="container">
         <div class="task-list-panel">
-            <h2>Tasks</h2>
+            <h2>
+                Tasks
+                <button id="theme-btn" class="theme-toggle-btn" onclick="toggleTheme()">☀️ Light Mode</button>
+            </h2>
             <div class="add-task-form">
                 <input type="text" id="new-task-input" placeholder="Add a new task..." onkeypress="handleEnter(event)">
                 <button onclick="addTask()">Add</button>
