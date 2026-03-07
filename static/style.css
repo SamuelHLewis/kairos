@@ -289,3 +289,12 @@ input[type="date"] {
 
 .q4 { border-top: 4px solid #1a535c; } /* Not Urgent & Not Important */
 .q4 li { border-left-color: #1a535c; }
+
+/* Overdue task styling - red border for tasks past their due date */
+.task-item.overdue {
+    border-left: 4px solid #ff4d4d;
+}
+
+.quadrant li.overdue {
+    border-left-color: #ff4d4d;
+}

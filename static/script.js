@@ -1,5 +1,14 @@
 let currentTasks = [];
 
+function isTaskOverdue(task) {
+    if (!task.due_date || task.status === 'complete') return false;
+    const dueDate = new Date(task.due_date);
+    const today = new Date();
+    dueDate.setHours(0,0,0,0);
+    today.setHours(0,0,0,0);
+    return dueDate < today;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     fetchTasks();
@@ -44,7 +53,9 @@ function renderTaskList(tasks) {
 
     tasks.forEach(task => {
         const li = document.createElement('li');
-        li.className = `task-item ${task.status === 'complete' ? 'completed' : ''}`;
+        li.classList.add('task-item');
+        if (task.status === 'complete') li.classList.add('completed');
+        if (isTaskOverdue(task)) li.classList.add('overdue');
         
         li.innerHTML = `
             <div class="task-header">
@@ -157,6 +168,9 @@ function renderMatrix(tasks) {
 
         const li = document.createElement('li');
         li.textContent = task.task;
+        if (isTaskOverdue(task)) {
+            li.classList.add('overdue');
+        }
 
         if (isImportant && isUrgent) {
             q1List.appendChild(li);
