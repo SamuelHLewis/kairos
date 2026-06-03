@@ -41,58 +41,6 @@ function readTask(taskFilePath: string) {
     return task
 }
 
-async function createNewTask() {
-    const newTask = await inquirer.prompt<taskEntry>([
-    {
-        type: 'input',
-        name: 'Name',
-        message: 'Name of task:'
-    },
-    {
-        type: 'input',
-        name: 'Description',
-        message: 'Description of task:'
-    },
-    {
-        type: 'input',
-        name: 'Due',
-        message: 'Due date of task (in format YYYY-MM-DDTHH:MM:SS.SSS):'
-    },
-    {
-        type: 'select',
-        name: 'Priority',
-        message: 'Priority level of task:',
-        choices: ["low", "high"]
-    },
-    {
-        type: 'select',
-        name: 'State',
-        message: 'Current state of task',
-        choices: ["notStarted", "inProgress", "done"]
-    }
-    ]);
-    return newTask
-}
-
-async function mainMenu() {
-    const { action } = await inquirer.prompt([
-        {
-            type: 'select',
-            name: 'action',
-            message: 'What would you like to do?',
-            choices: ['Create a new task', 'Edit an existing task']
-        }
-    ]);
-
-    if (action === 'Create a new task') {
-        const userTask = await createNewTask();
-        console.log("New task created");
-        console.log(userTask);
-    } else if (action === 'Edit an existing task') {
-        "Yet to be implemented"
-    }
-}
-
 function calculateDaysToGo(taskTime: number) {
     const now = new Date()
     const msToGo: number = taskTime - now.getTime();
@@ -133,14 +81,19 @@ function renderMatrix(
     console.log(bottom);
 }
 
-function displayEisenhowerMatrix() {
+function loadTasks(taskDir: string) {
     let tasks = []
-    const taskPaths = fs.readdirSync('./tasks').filter(f =>
+    const taskPaths = fs.readdirSync(taskDir).filter(f =>
         fs.statSync(`./tasks/${f}`).isFile()
     )
     for (let taskPath of taskPaths){
         tasks.push(readTask(`./tasks/${taskPath}`))
     }
+    return tasks
+}
+
+function displayEisenhowerMatrix() {
+    let tasks = loadTasks('./tasks')
     let tasksHighPriorityUrgent = []
     let tasksHighPriorityDistant = []
     let tasksLowPriorityUrgent = []
@@ -163,6 +116,86 @@ function displayEisenhowerMatrix() {
     )
 }
 
+function listTaskNames() {
+    let tasks = loadTasks('./tasks')
+    let taskNames = []
+    for (let task of tasks) {
+        taskNames.push(task.Name)
+    }
+    return taskNames
+}
+
+async function createNewTask() {
+    const newTask = await inquirer.prompt<taskEntry>([
+    {
+        type: 'input',
+        name: 'Name',
+        message: 'Name of task:'
+    },
+    {
+        type: 'input',
+        name: 'Description',
+        message: 'Description of task:'
+    },
+    {
+        type: 'input',
+        name: 'Due',
+        message: 'Due date of task (in format YYYY-MM-DDTHH:MM:SS.SSS):'
+    },
+    {
+        type: 'select',
+        name: 'Priority',
+        message: 'Priority level of task:',
+        // only offer choices from the string values of the taskPriority
+        choices: Object.keys(taskPriority).filter(k => isNaN(Number(k)))
+    },
+    {
+        type: 'select',
+        name: 'State',
+        message: 'Current state of task',
+        // only offer choices from the string values of the taskState
+        choices: Object.keys(taskState).filter(k => isNaN(Number(k)))
+    }
+    ]);
+    return newTask
+}
+
+async function deleteTask() {
+    const { task } = await inquirer.prompt([
+        {
+            type: 'select',
+            name: 'task',
+            message: 'Which task would you like to delete?',
+            choices: listTaskNames()
+        }
+    ]);
+    const filename = `./tasks/${task.replace(/ /g, '-')}.json`;
+    fs.unlinkSync(filename);
+    console.log(`Task "${task}" deleted.`)
+}
+
+async function mainMenu() {
+    const { action } = await inquirer.prompt([
+        {
+            type: 'select',
+            name: 'action',
+            message: 'What would you like to do?',
+            choices: ['Create a new task', 'Delete an existing task']
+        }
+    ]);
+
+    if (action === 'Create a new task') {
+        const userTask = await createNewTask();
+        const filename = `./tasks/${userTask.Name.replace(/ /g, '-')}.json`;
+        fs.writeFileSync(filename, JSON.stringify(userTask, null, 2));
+        console.log("New task created");
+        console.log(userTask);
+    } else if (action === 'Delete an existing task') {
+        deleteTask()
+    }
+}
+
+// on launch, the current set of tasks are displayed
+displayEisenhowerMatrix();
 // User chooses to add new or edit existing
-displayEisenhowerMatrix()
 mainMenu();
