@@ -1,8 +1,6 @@
 import { taskState, taskPriority, taskEntry } from './types';
 import { loadTasks } from './taskIO';
-
-// set the threshold for urgency in days here
-const urgentThreshold = 3;
+import { config } from './config';
 
 function calculateDaysToGo(taskTime: number) {
     const now = new Date()
@@ -52,13 +50,13 @@ export function displayEisenhowerMatrix() {
     let tasksLowPriorityDistant = []
     for (let task of tasks) {
         let daysToGo: number = calculateDaysToGo(task.Due.getTime())
-        if(task.Priority === taskPriority.high && daysToGo < urgentThreshold) {
+        if(task.Priority === taskPriority.high && daysToGo < config.urgentThreshold) {
             tasksHighPriorityUrgent.push(task)
-        } else if(task.Priority === taskPriority.high && daysToGo >= urgentThreshold){
+        } else if(task.Priority === taskPriority.high && daysToGo >= config.urgentThreshold){
             tasksHighPriorityDistant.push(task)
-        } else if(task.Priority === taskPriority.low && daysToGo < urgentThreshold) {
+        } else if(task.Priority === taskPriority.low && daysToGo < config.urgentThreshold) {
             tasksLowPriorityUrgent.push(task)
-        } else if(task.Priority === taskPriority.low && daysToGo >= urgentThreshold){
+        } else if(task.Priority === taskPriority.low && daysToGo >= config.urgentThreshold){
             tasksLowPriorityDistant.push(task)
         }
     }
