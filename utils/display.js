@@ -4,8 +4,7 @@ exports.renderMatrix = renderMatrix;
 exports.displayEisenhowerMatrix = displayEisenhowerMatrix;
 const types_1 = require("./types");
 const taskIO_1 = require("./taskIO");
-// set the threshold for urgency in days here
-const urgentThreshold = 3;
+const config_1 = require("./config");
 function calculateDaysToGo(taskTime) {
     const now = new Date();
     const msToGo = taskTime - now.getTime();
@@ -42,16 +41,16 @@ function displayEisenhowerMatrix() {
     let tasksLowPriorityDistant = [];
     for (let task of tasks) {
         let daysToGo = calculateDaysToGo(task.Due.getTime());
-        if (task.Priority === types_1.taskPriority.high && daysToGo < urgentThreshold) {
+        if (task.Priority === types_1.taskPriority.high && daysToGo < config_1.config.urgentThreshold) {
             tasksHighPriorityUrgent.push(task);
         }
-        else if (task.Priority === types_1.taskPriority.high && daysToGo >= urgentThreshold) {
+        else if (task.Priority === types_1.taskPriority.high && daysToGo >= config_1.config.urgentThreshold) {
             tasksHighPriorityDistant.push(task);
         }
-        else if (task.Priority === types_1.taskPriority.low && daysToGo < urgentThreshold) {
+        else if (task.Priority === types_1.taskPriority.low && daysToGo < config_1.config.urgentThreshold) {
             tasksLowPriorityUrgent.push(task);
         }
-        else if (task.Priority === types_1.taskPriority.low && daysToGo >= urgentThreshold) {
+        else if (task.Priority === types_1.taskPriority.low && daysToGo >= config_1.config.urgentThreshold) {
             tasksLowPriorityDistant.push(task);
         }
     }

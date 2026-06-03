@@ -43,4 +43,4 @@ Then you can launch the app with:
 node app.js
 ```
 ### Changing the Urgency Threshold
-By default, tasks due in fewer than 3 days are treated as urgent, and all others are non-urgent. To change this, adjust the `urgentThreshold` value in `app.ts`.
+By default, tasks due in fewer than 3 days are treated as urgent, and all others are non-urgent. To change this, adjust the `urgentThreshold` value in `kairos.config.json`.
