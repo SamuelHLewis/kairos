@@ -19,7 +19,7 @@ async function createNewTask() {
     {
         type: 'input',
         name: 'Due',
-        message: 'Due date of task (in format YYYY-MM-DDTHH:MM:SS.SSS):'
+        message: 'Due date of task (in format YYYY-MM-DD):'
     },
     {
         type: 'select',
