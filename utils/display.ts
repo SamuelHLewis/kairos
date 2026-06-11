@@ -50,13 +50,13 @@ export function displayEisenhowerMatrix() {
     let tasksLowPriorityDistant = []
     for (let task of tasks) {
         let daysToGo: number = calculateDaysToGo(task.Due.getTime())
-        if(task.Priority === taskPriority.high && daysToGo < config.urgentThreshold) {
+        if(task?.Priority === taskPriority.high && daysToGo < config.urgentThreshold) {
             tasksHighPriorityUrgent.push(task)
-        } else if(task.Priority === taskPriority.high && daysToGo >= config.urgentThreshold){
+        } else if(task?.Priority === taskPriority.high && daysToGo >= config.urgentThreshold){
             tasksHighPriorityDistant.push(task)
-        } else if(task.Priority === taskPriority.low && daysToGo < config.urgentThreshold) {
+        } else if(task?.Priority === taskPriority.low && daysToGo < config.urgentThreshold) {
             tasksLowPriorityUrgent.push(task)
-        } else if(task.Priority === taskPriority.low && daysToGo >= config.urgentThreshold){
+        } else if(task?.Priority === taskPriority.low && daysToGo >= config.urgentThreshold){
             tasksLowPriorityDistant.push(task)
         }
     }
