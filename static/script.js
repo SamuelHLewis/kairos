@@ -140,6 +140,7 @@ function renderMatrix(tasks) {
         if (task.status === 'complete') return; // Don't show completed tasks in matrix
 
         let isUrgent = false;
+        let diffDays = null;
         if (task.due_date) {
             const dueDate = new Date(task.due_date);
             const today = new Date();
@@ -148,7 +149,7 @@ function renderMatrix(tasks) {
             today.setHours(0,0,0,0);
             
             const diffTime = dueDate - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             
             isUrgent = diffDays <= thresholdDays;
         }
@@ -156,7 +157,24 @@ function renderMatrix(tasks) {
         const isImportant = task.importance === 'high';
 
         const li = document.createElement('li');
-        li.textContent = task.task;
+
+        let badgeHtml = '';
+        if (diffDays !== null) {
+            let badgeClass, badgeText;
+            if (diffDays > 0) {
+                badgeClass = 'days-green';
+                badgeText = `${diffDays}d`;
+            } else if (diffDays === 0) {
+                badgeClass = 'days-orange';
+                badgeText = 'Today';
+            } else {
+                badgeClass = 'days-red';
+                badgeText = `${Math.abs(diffDays)}d late`;
+            }
+            badgeHtml = `<span class="days-badge ${badgeClass}">${badgeText}</span>`;
+        }
+
+        li.innerHTML = `<span class="matrix-task-name">${task.task}</span>${badgeHtml}`;
 
         if (isImportant && isUrgent) {
             q1List.appendChild(li);
