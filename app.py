@@ -1,20 +1,31 @@
 from flask import Flask, render_template, jsonify, request
-import pandas as pd
+import sqlite3
 import os
 
 app = Flask(__name__)
-TASKS_FILE = 'tasks.csv'
+DB_FILE = 'tasks.db'
 
-def read_tasks():
-    if not os.path.exists(TASKS_FILE):
-        return []
-    df = pd.read_csv(TASKS_FILE)
-    df = df.fillna('')
-    return df.to_dict(orient='records')
+ALLOWED_FIELDS = {'task', 'status', 'importance', 'due_date'}
 
-def write_tasks(tasks):
-    df = pd.DataFrame(tasks)
-    df.to_csv(TASKS_FILE, index=False)
+def get_db():
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_db():
+    with get_db() as conn:
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS tasks (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                task        TEXT    NOT NULL,
+                status      TEXT    NOT NULL DEFAULT 'incomplete',
+                importance  TEXT    NOT NULL DEFAULT 'low',
+                due_date    TEXT
+            )
+        ''')
+        conn.commit()
+
+init_db()
 
 @app.route('/')
 def index():
@@ -22,7 +33,13 @@ def index():
 
 @app.route('/tasks', methods=['GET'])
 def get_tasks():
-    tasks = read_tasks()
+    with get_db() as conn:
+        rows = conn.execute('SELECT * FROM tasks ORDER BY id').fetchall()
+    tasks = [dict(row) for row in rows]
+    # Normalise due_date: return empty string instead of None for the frontend
+    for t in tasks:
+        if t['due_date'] is None:
+            t['due_date'] = ''
     return jsonify(tasks)
 
 @app.route('/update_task', methods=['POST'])
@@ -32,18 +49,24 @@ def update_task():
     field = data.get('field')
     value = data.get('value')
 
-    tasks = read_tasks()
-    updated = False
-    for task in tasks:
-        if str(task['id']) == str(task_id):
-            task[field] = value
-            updated = True
-            break
-    
-    if updated:
-        write_tasks(tasks)
-        return jsonify({'status': 'success', 'tasks': tasks})
-    return jsonify({'status': 'error', 'message': 'Task not found'}), 404
+    if field not in ALLOWED_FIELDS:
+        return jsonify({'status': 'error', 'message': 'Invalid field'}), 400
+
+    db_value = value if value != '' else None
+    with get_db() as conn:
+        cursor = conn.execute(
+            f'UPDATE tasks SET {field} = ? WHERE id = ?',
+            (db_value, task_id)
+        )
+        conn.commit()
+        if cursor.rowcount == 0:
+            return jsonify({'status': 'error', 'message': 'Task not found'}), 404
+        rows = conn.execute('SELECT * FROM tasks ORDER BY id').fetchall()
+    tasks = [dict(row) for row in rows]
+    for t in tasks:
+        if t['due_date'] is None:
+            t['due_date'] = ''
+    return jsonify({'status': 'success', 'tasks': tasks})
 
 @app.route('/add_task', methods=['POST'])
 def add_task():
@@ -52,32 +75,29 @@ def add_task():
     if not task_name:
         return jsonify({'status': 'error', 'message': 'Task name is required'}), 400
 
-    tasks = read_tasks()
-    new_id = 1 if not tasks else max(int(t['id']) for t in tasks) + 1
-    new_task = {
-        'id': new_id,
-        'task': task_name,
-        'status': 'incomplete',
-        'importance': 'low', # Default
-        'due_date': ''       # Default
-    }
-    tasks.append(new_task)
-    write_tasks(tasks)
+    with get_db() as conn:
+        cursor = conn.execute(
+            'INSERT INTO tasks (task, status, importance, due_date) VALUES (?, ?, ?, ?)',
+            (task_name, 'incomplete', 'low', None)
+        )
+        conn.commit()
+        new_id = cursor.lastrowid
+        row = conn.execute('SELECT * FROM tasks WHERE id = ?', (new_id,)).fetchone()
+    new_task = dict(row)
+    new_task['due_date'] = new_task['due_date'] or ''
     return jsonify({'status': 'success', 'task': new_task})
 
 @app.route('/delete_task', methods=['POST'])
 def delete_task():
     data = request.json
     task_id = data.get('id')
-    
-    tasks = read_tasks()
-    initial_count = len(tasks)
-    tasks = [t for t in tasks if str(t['id']) != str(task_id)]
-    
-    if len(tasks) < initial_count:
-        write_tasks(tasks)
-        return jsonify({'status': 'success'})
-    return jsonify({'status': 'error', 'message': 'Task not found'}), 404
+
+    with get_db() as conn:
+        cursor = conn.execute('DELETE FROM tasks WHERE id = ?', (task_id,))
+        conn.commit()
+        if cursor.rowcount == 0:
+            return jsonify({'status': 'error', 'message': 'Task not found'}), 404
+    return jsonify({'status': 'success'})
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

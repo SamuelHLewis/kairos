@@ -1,1 +1,2 @@
-tasks.csv
+tasks.db
+__pycache__/*
