@@ -1,4 +1,2 @@
-tasks/*
-node_modules/*
-*.js
-*.js.map
+tasks.db
+__pycache__/*
