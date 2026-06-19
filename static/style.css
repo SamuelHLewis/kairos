@@ -275,7 +275,30 @@ input[type="date"] {
     border-left: 4px solid var(--li-border);
     font-size: 0.95em;
     transition: background-color 0.3s, border-color 0.3s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
 }
+
+.matrix-task-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.days-badge {
+    font-size: 0.8em;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.days-green  { color: #4caf50; }
+.days-orange { color: #ff9800; }
+.days-red    { color: #f44336; }
 
 /* Specific Quadrant Styling */
 .q1 { border-top: 4px solid #ff6b6b; } /* Urgent & Important */
