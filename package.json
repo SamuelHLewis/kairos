@@ -1,0 +1,29 @@
+{
+  "dependencies": {
+    "inquirer": "^14.0.0",
+    "papaparse": "^5.5.3",
+    "typescript": "^6.0.3"
+  },
+  "name": "kairos",
+  "version": "0.1.0",
+  "description": "a simple task manager",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamuelHLewis/kairos.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SamuelHLewis/kairos/issues"
+  },
+  "homepage": "https://github.com/SamuelHLewis/kairos#readme",
+  "devDependencies": {
+    "@types/inquirer": "^9.0.9",
+    "@types/node": "^25.9.1",
+    "@types/papaparse": "^5.5.2"
+  }
+}
