@@ -40,39 +40,71 @@ function fetchTasks() {
 
 function renderTaskList(tasks) {
     const taskList = document.getElementById('task-list');
+    const completedTaskList = document.getElementById('completed-task-list');
     taskList.innerHTML = '';
+    completedTaskList.innerHTML = '';
 
-    tasks.forEach(task => {
-        if (task.status === 'complete') return;
+    const activeTasks = tasks.filter(task => task.status !== 'complete');
+    const completedTasks = tasks.filter(task => task.status === 'complete');
 
-        const li = document.createElement('li');
-        li.className = `task-item ${task.status === 'complete' ? 'completed' : ''}`;
-        
-        li.innerHTML = `
-            <div class="task-header">
-                <input type="checkbox" ${task.status === 'complete' ? 'checked' : ''} 
-                       onchange="updateTask('${task.id}', 'status', this.checked ? 'complete' : 'incomplete')">
-                <span class="task-name" contenteditable="true" 
-                      onblur="updateTask('${task.id}', 'task', this.textContent)"
-                      onkeydown="if(event.key === 'Enter') { event.preventDefault(); this.blur(); }">${task.task}</span>
-            </div>
-            <div class="task-controls">
-                <div class="task-control-group">
-                    <label>Importance:</label>
-                    <select onchange="updateTask('${task.id}', 'importance', this.value)">
-                        <option value="high" ${task.importance === 'high' ? 'selected' : ''}>High</option>
-                        <option value="low" ${task.importance === 'low' ? 'selected' : ''}>Low</option>
-                    </select>
-                </div>
-                <div class="task-control-group">
-                    <label>Due Date:</label>
-                    <input type="date" value="${task.due_date || ''}" onchange="updateTask('${task.id}', 'due_date', this.value)">
-                </div>
-                <button class="delete-btn" onclick="deleteTask('${task.id}')">Delete</button>
-            </div>
-        `;
+    // Sort completed tasks in reverse chronological order
+    completedTasks.sort((a, b) => {
+        const timeA = a.completed_at ? new Date(a.completed_at).getTime() : 0;
+        const timeB = b.completed_at ? new Date(b.completed_at).getTime() : 0;
+        if (timeA !== timeB) return timeB - timeA;
+        return b.id - a.id;
+    });
+
+    activeTasks.forEach(task => {
+        const li = createTaskElement(task);
         taskList.appendChild(li);
     });
+
+    completedTasks.forEach(task => {
+        const li = createTaskElement(task);
+        completedTaskList.appendChild(li);
+    });
+}
+
+function createTaskElement(task) {
+    const li = document.createElement('li');
+    li.className = `task-item ${task.status === 'complete' ? 'completed' : ''}`;
+    
+    li.innerHTML = `
+        <div class="task-header">
+            <input type="checkbox" ${task.status === 'complete' ? 'checked' : ''} 
+                   onchange="updateTask('${task.id}', 'status', this.checked ? 'complete' : 'incomplete')">
+            <span class="task-name" contenteditable="true" 
+                  onblur="updateTask('${task.id}', 'task', this.textContent)"
+                  onkeydown="if(event.key === 'Enter') { event.preventDefault(); this.blur(); }">${task.task}</span>
+        </div>
+        <div class="task-controls">
+            <div class="task-control-group">
+                <label>Importance:</label>
+                <select onchange="updateTask('${task.id}', 'importance', this.value)">
+                    <option value="high" ${task.importance === 'high' ? 'selected' : ''}>High</option>
+                    <option value="low" ${task.importance === 'low' ? 'selected' : ''}>Low</option>
+                </select>
+            </div>
+            <div class="task-control-group">
+                <label>Due Date:</label>
+                <input type="date" value="${task.due_date || ''}" onchange="updateTask('${task.id}', 'due_date', this.value)">
+            </div>
+            <button class="delete-btn" onclick="deleteTask('${task.id}')">Delete</button>
+        </div>
+    `;
+    return li;
+}
+
+function toggleCompletedTasks() {
+    const section = document.querySelector('.completed-tasks-section');
+    const icon = document.getElementById('completed-toggle-icon');
+    section.classList.toggle('expanded');
+    if (section.classList.contains('expanded')) {
+        icon.textContent = '▲';
+    } else {
+        icon.textContent = '▼';
+    }
 }
 
 function handleEnter(event) {
