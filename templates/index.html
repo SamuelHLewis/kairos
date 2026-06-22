@@ -21,9 +21,22 @@
                 <input type="text" id="new-task-input" placeholder="Add a new task..." onkeypress="handleEnter(event)">
                 <button onclick="addTask()">Add</button>
             </div>
-            <ul id="task-list">
-                <!-- Tasks will be injected here via JS -->
-            </ul>
+            <div class="active-tasks-container">
+                <ul id="task-list">
+                    <!-- Tasks will be injected here via JS -->
+                </ul>
+            </div>
+            <div class="completed-tasks-section">
+                <h3 onclick="toggleCompletedTasks()">
+                    Completed Tasks
+                    <span id="completed-toggle-icon">▼</span>
+                </h3>
+                <div class="completed-tasks-container" id="completed-tasks-container">
+                    <ul id="completed-task-list">
+                        <!-- Completed tasks will be injected here via JS -->
+                    </ul>
+                </div>
+            </div>
         </div>
         <div class="matrix-panel">
             <h2>Eisenhower Matrix</h2>

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, request
 import sqlite3
 import os
+from datetime import datetime, timezone
 
 app = Flask(__name__)
 DB_FILE = 'tasks.db'
@@ -23,6 +24,10 @@ def init_db():
                 due_date    TEXT
             )
         ''')
+        try:
+            conn.execute('ALTER TABLE tasks ADD COLUMN completed_at TEXT')
+        except sqlite3.OperationalError:
+            pass # Column already exists
         conn.commit()
 
 init_db()
@@ -54,10 +59,17 @@ def update_task():
 
     db_value = value if value != '' else None
     with get_db() as conn:
-        cursor = conn.execute(
-            f'UPDATE tasks SET {field} = ? WHERE id = ?',
-            (db_value, task_id)
-        )
+        if field == 'status':
+            completed_at = datetime.now(timezone.utc).isoformat() if value == 'complete' else None
+            cursor = conn.execute(
+                'UPDATE tasks SET status = ?, completed_at = ? WHERE id = ?',
+                (db_value, completed_at, task_id)
+            )
+        else:
+            cursor = conn.execute(
+                f'UPDATE tasks SET {field} = ? WHERE id = ?',
+                (db_value, task_id)
+            )
         conn.commit()
         if cursor.rowcount == 0:
             return jsonify({'status': 'error', 'message': 'Task not found'}), 404

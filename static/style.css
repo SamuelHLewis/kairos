@@ -71,9 +71,52 @@ body {
     background-color: var(--panel-bg);
     border-right: 1px solid var(--border-color);
     padding: 20px;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
     box-shadow: 2px 0 5px rgba(0,0,0,0.05);
     transition: background-color 0.3s, border-color 0.3s;
+}
+
+.active-tasks-container {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.completed-tasks-section {
+    margin-top: 10px;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    flex-direction: column;
+    transition: flex 0.3s;
+}
+
+.completed-tasks-section.expanded {
+    flex: 1;
+    min-height: 0;
+}
+
+.completed-tasks-section h3 {
+    margin: 10px 0 0 0;
+    padding-bottom: 10px;
+    font-size: 1.1em;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+}
+
+.completed-tasks-container {
+    overflow-y: auto;
+    display: none;
+    flex: 1;
+    min-height: 0;
+}
+
+.completed-tasks-section.expanded .completed-tasks-container {
+    display: block;
 }
 
 .task-list-panel h2 {
