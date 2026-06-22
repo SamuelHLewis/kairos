@@ -43,6 +43,8 @@ function renderTaskList(tasks) {
     taskList.innerHTML = '';
 
     tasks.forEach(task => {
+        if (task.status === 'complete') return;
+
         const li = document.createElement('li');
         li.className = `task-item ${task.status === 'complete' ? 'completed' : ''}`;
         
